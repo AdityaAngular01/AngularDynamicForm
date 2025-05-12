@@ -1,0 +1,184 @@
+<section class="relative w-full min-h-screen">
+  <!-- Main Layout -->
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-700">
+
+    <!-- Mobile Toggle Button -->
+    <button class="md:hidden fixed top-4 left-4 z-50 bg-blue-700 text-white px-4 py-2 rounded"
+      (click)="toggleSidebar()">
+      {{ isSidebarOpen ? 'Close' : 'Menu' }}
+    </button>
+
+    <!-- Sidebar -->
+    <div
+      class="fixed inset-y-0 left-0 z-40 w-64 transform bg-red-500 p-4 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:w-1/5 md:block overflow-y-auto h-screen"
+      [class.-translate-x-full]="!isSidebarOpen"
+      [class.block]="isSidebarOpen"
+      [class.hidden]="!isSidebarOpen && screenIsSmall()">
+
+      <!-- Draggable Field List -->
+      <div class="space-y-4 mt-2" cdkDropList (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let field of fields; index as i"
+          class="flex items-center justify-between p-4 bg-white shadow rounded-lg" cdkDrag>
+          <div>
+            <p class="text-lg font-semibold text-gray-800">{{ field.name | titlecase }}</p>
+            <p class="text-sm text-gray-500">Type: {{ field.type }}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 !text-xs">
+            <button type="button" (click)="editField(field)">
+              <lucide-icon [img]="icons.edit" class="hover:text-gray-700 text-gray-500"></lucide-icon>
+            </button>
+            <button type="button" (click)="deleteField(i)">
+              <lucide-icon [img]="icons.delete" class="hover:text-red-600 text-gray-500"></lucide-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Area -->
+    <div class="h-screen overflow-y-auto bg-amber-400 w-full md:w-4/5">
+      <button type="button" (click)="generateCode()" class="p-2 bg-black text-white">Generate Code</button>
+
+      <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 w-full">
+        <div *ngFor="let field of fields" [ngClass]="[
+          field.width || 'col-span-12',
+          'p-4',
+          field.type === 'blank'? '!bg-transparent':'transition-shadow hover:shadow-xl shadow-lg rounded-xl bg-white'
+        ]">
+          <section [ngClass]="field.type === 'blank'? 'hidden':''">
+            <label class="block mb-2 font-semibold text-gray-800">{{ field.name | titlecase }}</label>
+
+            <!-- Input Types -->
+            <input *ngIf="['text', 'email', 'password', 'tel', 'url', 'search', 'date'].includes(field.type)"
+              [type]="field.type" [formControlName]="field.name" [placeholder]="field.placeholder"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+
+            <!-- Select -->
+            <select *ngIf="field.type === 'select'" [formControlName]="field.name"
+              class="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+              <option value="" selected disabled>Select {{field.name}}</option>
+              <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+            </select>
+
+            <!-- Radio -->
+            <div *ngIf="field.type === 'radio'" class="flex gap-4 mt-3">
+              <label *ngFor="let opt of field.options" class="inline-flex items-center gap-2">
+                <input type="radio" [value]="opt" [formControlName]="field.name" />
+                <span>{{ opt }}</span>
+              </label>
+            </div>
+
+            <!-- Checkbox -->
+            <div *ngIf="field.type === 'checkbox'" class="space-y-2 mt-2">
+              <div *ngFor="let opt of field.options; let i = index" class="flex items-center gap-2">
+                <input type="checkbox" [formControlName]="field.name" [value]="opt" id="{{ field.name + '_' + i }}"
+                  class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                <label [for]="field.name + '_' + i" class="text-sm text-gray-700">{{ opt }}</label>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-span-full mt-4">
+          <button type="submit" [disabled]="dynamicForm.invalid"
+            class="bg-green-600 text-white font-medium px-6 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Field Modal -->
+  @if(showOverlay()) {
+  <div class="fixed inset-0 z-30 bg-black/80 flex items-center justify-center">
+    <div class="bg-white w-[90%] max-w-md md:max-w-lg p-6 rounded-2xl shadow-2xl space-y-4">
+      <h2 class="text-xl font-bold text-gray-800">Add New Field</h2>
+
+      <form [formGroup]="fieldForm" class="space-y-4">
+        <!-- Field Name -->
+        <div>
+          <label for="fieldName" class="block text-sm font-medium text-gray-700">Field Name <span class="text-red-700">*</span></label>
+          <input type="text" id="fieldName" formControlName="fieldName"
+            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Enter field name" />
+        </div>
+
+        <!-- Field Type -->
+        <div>
+          <label for="fieldType" class="block text-sm font-medium text-gray-700">Field Type <span class="text-red-700">*</span></label>
+          <select id="fieldType" formControlName="fieldType"
+            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option disabled selected value="">Select Field Type</option>
+            <option *ngFor="let field of inputTypes" [value]="field">{{field | titlecase}}</option>
+          </select>
+        </div>
+
+        <!-- Field Width -->
+        <div>
+          <label for="fieldWidth" class="block text-sm font-medium text-gray-700">Field Width</label>
+          <select id="fieldWidth" formControlName="fieldWidth"
+            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option *ngFor="let width of fieldsWidths; index as i" [value]="width.className" [selected]="i === 0">
+              {{ width.title }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Placeholder -->
+        @if(!showSelect()) {
+        <div>
+          <label for="fieldPlaceholder" class="block text-sm font-medium text-gray-700">Placeholder</label>
+          <input type="text" id="fieldPlaceholder" formControlName="fieldPlaceholder"
+            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            [placeholder]="'Enter placeholder for ' + ((fieldForm.get('fieldName')?.value || 'field') | lowercase) + '.'" />
+        </div>
+        }
+
+        <!-- Options -->
+        @if(showSelect()) {
+        <div>
+          <label for="fieldOptions" class="block text-sm font-medium text-gray-700">Enter Options <span class="text-red-700">*</span></label>
+          <input type="text" id="fieldOptions" formControlName="fieldOptions"
+            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Value1, Value2, Value3,..." />
+        </div>
+        }
+
+        <!-- Modal Buttons -->
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800"
+            (click)="fieldModal()">Cancel</button>
+          <button type="button" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700"
+            (click)="editedField ? onSaveEditedField() : saveField()">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- Add Field Button (Fixed) -->
+  <button type="button"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 fixed bottom-2.5 right-2.5"
+    (click)="fieldModal()">
+    Add Field
+  </button>
+
+  <!-- Code Preview -->
+  <pre class="max-w-dvw overflow-auto max-h-96 p-4">{{ generatedCode }}</pre>
+</section>
+
+<!-- <div class="p-4">
+  <label class="block text-white font-semibold mb-2">Choose Code Style:</label>
+  <div class="flex gap-6 text-white">
+    <label class="flex items-center gap-2">
+      <input type="radio" name="style" value="html-css" [(ngModel)]="styleMode" (change)="generateCode()" />
+      HTML + CSS
+    </label>
+    <label class="flex items-center gap-2">
+      <input type="radio" name="style" value="html-tailwind" [(ngModel)]="styleMode" (change)="generateCode()" />
+      HTML + Tailwind
+    </label>
+  </div>
+</div> -->

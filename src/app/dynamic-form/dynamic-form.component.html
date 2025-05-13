@@ -27,7 +27,7 @@
 
   <div class="space-y-4">
     <div *ngFor="let field of fields; index as i; first as f; last as l"
-         class="p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-3">
+         class="p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-3" [ngClass]="{'mb-24': l}">
 
       <!-- Field Info -->
       <div class="flex-1">

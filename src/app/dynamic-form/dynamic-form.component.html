@@ -1,68 +1,103 @@
-<section class="relative w-full min-h-screen">
-  <!-- Main Layout -->
-  <div class="min-h-screen flex flex-col md:flex-row bg-gray-700">
+<nav class="w-full fixed top-0 left-0 z-40 bg-white border-b border-gray-200 shadow-md">
+  <div class="flex items-center justify-between px-4 py-3 md:px-6">
+    <div class="text-2xl font-bold text-blue-700">Dynamic Form Builder</div>
 
-    <!-- Mobile Toggle Button -->
-    <button class="md:hidden fixed top-4 left-4 z-50 bg-blue-700 text-white px-4 py-2 rounded"
-      (click)="toggleSidebar()">
-      {{ isSidebarOpen ? 'Close' : 'Menu' }}
+    <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+      <li><a routerLink="/dashboard" routerLinkActive="text-blue-700 border-b-2 border-blue-700" class="hover:text-blue-700 transition">Dashboard</a></li>
+      <li><a routerLink="/settings" routerLinkActive="text-blue-700 border-b-2 border-blue-700" class="hover:text-blue-700 transition">Settings</a></li>
+    </ul>
+
+    <button class="md:hidden px-4 py-2 rounded focus:outline-none" (click)="toggleSidebar()">
+      <lucide-icon [img]="!isSidebarOpen? icons.menu : icons.closeMenu" class=" transition"></lucide-icon>
     </button>
+  </div>
+</nav>
 
-    <!-- Sidebar -->
-    <div
-      class="fixed inset-y-0 left-0 z-40 w-64 transform bg-red-500 p-4 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:w-1/5 md:block overflow-y-auto h-screen"
-      [class.-translate-x-full]="!isSidebarOpen"
-      [class.block]="isSidebarOpen"
-      [class.hidden]="!isSidebarOpen && screenIsSmall()">
+<section class="relative w-full min-h-screen bg-gray-100 pt-20">
+  <div class="min-h-screen flex flex-col md:flex-row">
 
-      <!-- Draggable Field List -->
-      <div class="space-y-4 mt-2" cdkDropList (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let field of fields; index as i"
-          class="flex items-center justify-between p-4 bg-white shadow rounded-lg" cdkDrag>
-          <div>
-            <p class="text-lg font-semibold text-gray-800">{{ field.name | titlecase }}</p>
-            <p class="text-sm text-gray-500">Type: {{ field.type }}</p>
-          </div>
-          <div class="grid grid-cols-2 gap-2 !text-xs">
-            <button type="button" (click)="editField(field)">
-              <lucide-icon [img]="icons.edit" class="hover:text-gray-700 text-gray-500"></lucide-icon>
-            </button>
-            <button type="button" (click)="deleteField(i)">
-              <lucide-icon [img]="icons.delete" class="hover:text-red-600 text-gray-500"></lucide-icon>
-            </button>
-          </div>
-        </div>
+<!-- Sidebar -->
+<div
+  class="fixed inset-y-0 left-0 z-40 w-72 transform bg-white border-r border-gray-200 p-4 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:block h-screen overflow-y-auto shadow-lg"
+  [class.-translate-x-full]="!isSidebarOpen"
+  [class.block]="isSidebarOpen"
+  [class.hidden]="!isSidebarOpen && screenIsSmall()"
+>
+  <h2 class="text-xl font-bold text-gray-800 mb-4">Form Fields</h2>
+
+  <div class="space-y-4">
+    <div *ngFor="let field of fields; index as i; first as f; last as l"
+         class="p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-3">
+
+      <!-- Field Info -->
+      <div class="flex-1">
+        <p class="text-base font-semibold text-gray-800 truncate">{{ field.name | titlecase }}</p>
+        <p class="text-sm text-gray-500">Type: {{ field.type }}</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-center gap-2 text-gray-500">
+
+        <!-- Up -->
+        <button type="button" [disabled]="f" (click)="moveFieldUp(i)"
+                class="hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition">
+          <lucide-icon [img]="icons.arrowUp" class="w-4 h-4"></lucide-icon>
+        </button>
+
+        <!-- Down -->
+        <button type="button" [disabled]="l" (click)="moveFieldDown(i)"
+                class="hover:text-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition">
+          <lucide-icon [img]="icons.arrowDown" class="w-4 h-4"></lucide-icon>
+        </button>
+
+        <!-- Edit -->
+        <button type="button" (click)="editField(field)"
+                class="hover:text-green-600 transition">
+          <lucide-icon [img]="icons.edit" class="w-4 h-4"></lucide-icon>
+        </button>
+
+        <!-- Delete -->
+        <button type="button" (click)="deleteField(i)"
+                class="hover:text-red-600 transition">
+          <lucide-icon [img]="icons.delete" class="w-4 h-4"></lucide-icon>
+        </button>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Form Area -->
-    <div class="h-screen overflow-y-auto bg-amber-400 w-full md:w-4/5">
-      <button type="button" (click)="generateCode()" class="p-2 bg-black text-white">Generate Code</button>
 
-      <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 w-full">
+    <div class="flex-1 overflow-y-auto w-full p-4">
+      <div class="flex justify-end mb-4">
+        <button (click)="generateCode()" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-900">Generate Code</button>
+      </div>
+
+      <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4">
         <div *ngFor="let field of fields" [ngClass]="[
           'col-span-12',
           field.width || 'col-span-12',
           'p-4',
-          field.type === 'blank'? '!bg-transparent':'transition-shadow hover:shadow-xl shadow-lg rounded-xl bg-white'
+          field.type === 'blank' ? '!bg-transparent' : 'bg-white shadow rounded-lg transition-shadow hover:shadow-xl'
         ]">
-          <section [ngClass]="field.type === 'blank'? 'hidden':''">
+          <section [ngClass]="field.type === 'blank' ? 'hidden' : ''">
             <label class="block mb-2 font-semibold text-gray-800">{{ field.name | titlecase }}</label>
 
             <!-- Input Types -->
             <input *ngIf="['text', 'email', 'password', 'tel', 'url', 'search', 'date'].includes(field.type)"
-              [type]="field.type" [formControlName]="field.name" [placeholder]="field.placeholder"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                   [type]="field.type"
+                   [formControlName]="field.name"
+                   [placeholder]="field.placeholder"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
 
             <!-- Select -->
             <select *ngIf="field.type === 'select'" [formControlName]="field.name"
-              class="w-full px-4 py-2 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
               <option value="" selected disabled>Select {{field.name}}</option>
               <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
             </select>
 
             <!-- Radio -->
-            <div *ngIf="field.type === 'radio'" class="flex gap-4 mt-3">
+            <div *ngIf="field.type === 'radio'" class="flex flex-wrap gap-4 mt-3">
               <label *ngFor="let opt of field.options" class="inline-flex items-center gap-2">
                 <input type="radio" [value]="opt" [formControlName]="field.name" />
                 <span>{{ opt }}</span>
@@ -73,7 +108,7 @@
             <div *ngIf="field.type === 'checkbox'" class="space-y-2 mt-2">
               <div *ngFor="let opt of field.options; let i = index" class="flex items-center gap-2">
                 <input type="checkbox" [formControlName]="field.name" [value]="opt" id="{{ field.name + '_' + i }}"
-                  class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                       class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
                 <label [for]="field.name + '_' + i" class="text-sm text-gray-700">{{ opt }}</label>
               </div>
             </div>
@@ -81,36 +116,48 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="col-span-full mt-4">
+        <div class="col-span-full mt-6">
           <button type="submit" [disabled]="dynamicForm.invalid"
-            class="bg-green-600 text-white font-medium px-6 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                  class="w-full bg-green-600 text-white py-2 px-6 rounded-md font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
             Submit
           </button>
         </div>
       </form>
     </div>
   </div>
+  <button type="button"
+    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 fixed bottom-4 right-4 shadow-lg z-40"
+    (click)="fieldModal()">
+    + Add Field
+  </button>
+  <div class="max-w-screen-xl mx-auto mt-6 px-4">
+    <pre class="bg-black text-white p-4 rounded-lg overflow-auto max-h-96 shadow-inner text-sm" *ngIf="generatedCode">
+      {{ generatedCode }}
+    </pre>
+  </div>
 
-  <!-- Add Field Modal -->
-  @if(showOverlay()) {
-  <div class="fixed inset-0 z-30 bg-black/80 flex items-center justify-center">
-    <div class="bg-white w-[90%] max-w-md md:max-w-lg p-6 rounded-2xl shadow-2xl space-y-4">
-      <h2 class="text-xl font-bold text-gray-800">Add New Field</h2>
+<!-- Add Field Modal -->
+@if(showOverlay()) {
+  <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center px-4 py-6">
+    <div class="bg-white w-full max-w-md md:max-w-lg p-6 rounded-2xl shadow-2xl space-y-6">
+      <h2 class="text-2xl font-bold text-gray-800">Add New Field</h2>
 
       <form [formGroup]="fieldForm" class="space-y-4">
         <!-- Field Name -->
         <div>
-          <label for="fieldName" class="block text-sm font-medium text-gray-700">Field Name <span class="text-red-700">*</span></label>
+          <label for="fieldName" class="block text-sm font-medium text-gray-700 mb-1">Field Name <span
+              class="text-red-600">*</span></label>
           <input type="text" id="fieldName" formControlName="fieldName"
-            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="Enter field name" />
         </div>
 
         <!-- Field Type -->
         <div>
-          <label for="fieldType" class="block text-sm font-medium text-gray-700">Field Type <span class="text-red-700">*</span></label>
+          <label for="fieldType" class="block text-sm font-medium text-gray-700 mb-1">Field Type <span
+              class="text-red-600">*</span></label>
           <select id="fieldType" formControlName="fieldType"
-            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             <option disabled selected value="">Select Field Type</option>
             <option *ngFor="let field of inputTypes" [value]="field">{{field | titlecase}}</option>
           </select>
@@ -118,9 +165,9 @@
 
         <!-- Field Width -->
         <div>
-          <label for="fieldWidth" class="block text-sm font-medium text-gray-700">Field Width</label>
+          <label for="fieldWidth" class="block text-sm font-medium text-gray-700 mb-1">Field Width</label>
           <select id="fieldWidth" formControlName="fieldWidth"
-            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             <option *ngFor="let width of fieldsWidths; index as i" [value]="width.className" [selected]="i === 0">
               {{ width.title }}
             </option>
@@ -130,9 +177,9 @@
         <!-- Placeholder -->
         @if(!showSelect()) {
         <div>
-          <label for="fieldPlaceholder" class="block text-sm font-medium text-gray-700">Placeholder</label>
+          <label for="fieldPlaceholder" class="block text-sm font-medium text-gray-700 mb-1">Placeholder</label>
           <input type="text" id="fieldPlaceholder" formControlName="fieldPlaceholder"
-            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             [placeholder]="'Enter placeholder for ' + ((fieldForm.get('fieldName')?.value || 'field') | lowercase) + '.'" />
         </div>
         }
@@ -140,47 +187,25 @@
         <!-- Options -->
         @if(showSelect()) {
         <div>
-          <label for="fieldOptions" class="block text-sm font-medium text-gray-700">Enter Options <span class="text-red-700">*</span></label>
+          <label for="fieldOptions" class="block text-sm font-medium text-gray-700 mb-1">Enter Options <span
+              class="text-red-600">*</span></label>
           <input type="text" id="fieldOptions" formControlName="fieldOptions"
-            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="Value1, Value2, Value3,..." />
         </div>
         }
 
         <!-- Modal Buttons -->
-        <div class="flex justify-end gap-2 pt-4">
-          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800"
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition"
             (click)="fieldModal()">Cancel</button>
-          <button type="button" class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700"
+          <button type="button"
+            class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition"
             (click)="editedField ? onSaveEditedField() : saveField()">Save</button>
         </div>
       </form>
     </div>
   </div>
-  }
+}
 
-  <!-- Add Field Button (Fixed) -->
-  <button type="button"
-    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 fixed bottom-2.5 right-2.5"
-    (click)="fieldModal()">
-    Add Field
-  </button>
-
-  <!-- Code Preview -->
-  <pre class="max-w-dvw overflow-auto max-h-96 p-4" *ngIf="generatedCode">{{ generatedCode }}</pre>
-  <app-code-generator></app-code-generator>
-</section>
-
-<!-- <div class="p-4">
-  <label class="block text-white font-semibold mb-2">Choose Code Style:</label>
-  <div class="flex gap-6 text-white">
-    <label class="flex items-center gap-2">
-      <input type="radio" name="style" value="html-css" [(ngModel)]="styleMode" (change)="generateCode()" />
-      HTML + CSS
-    </label>
-    <label class="flex items-center gap-2">
-      <input type="radio" name="style" value="html-tailwind" [(ngModel)]="styleMode" (change)="generateCode()" />
-      HTML + Tailwind
-    </label>
-  </div>
-</div> -->
+<app-code-generator></app-code-generator>

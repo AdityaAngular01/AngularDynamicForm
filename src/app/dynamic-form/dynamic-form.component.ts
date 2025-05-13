@@ -1,7 +1,7 @@
 import { CommonModule, LowerCasePipe, TitleCasePipe } from '@angular/common';
 import { AfterViewInit, Component, OnInit, signal, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { LucideAngularModule, SquarePen, Trash } from 'lucide-angular';
+import { LucideAngularModule, Menu, Move, MoveDown, MoveUp, SquarePen, Trash, X } from 'lucide-angular';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CodeGeneratorComponent } from './code-generator/code-generator.component';
 
@@ -26,22 +26,36 @@ interface DynamicField {
     LowerCasePipe,
     LucideAngularModule,
     CodeGeneratorComponent
-],
+  ],
   templateUrl: './dynamic-form.component.html',
   styleUrl: './dynamic-form.component.css'
 })
 export class DynamicFormComponent implements OnInit, AfterViewInit {
-  @ViewChild(CodeGeneratorComponent) codeGenerator:CodeGeneratorComponent = new CodeGeneratorComponent();
-  protected icons = {
-    edit: SquarePen,
-    delete: Trash
-  };
+  @ViewChild(CodeGeneratorComponent) codeGenerator!: CodeGeneratorComponent;
+
   protected showOverlay = signal<boolean>(false);
   protected showSelect = signal<boolean>(false);
+
   protected fields: DynamicField[] = [];
+  protected inputTypes: inputType[] = ['text', 'email', 'password', 'tel', 'url', 'date', 'search', 'radio', 'select', 'checkbox', 'blank'];
+
+  protected generatedCode: string = '';
+
   protected dynamicForm!: FormGroup;
   protected fieldForm!: FormGroup;
-  protected inputTypes: inputType[] = ['text', 'email', 'password', 'tel', 'url', 'date', 'search', 'radio', 'select', 'checkbox', 'blank'];
+
+  protected editedField!: DynamicField | null;
+
+  protected icons = {
+    edit: SquarePen,
+    delete: Trash,
+    menu: Menu,
+    closeMenu: X,
+    drag: Move,
+    arrowUp: MoveUp,
+    arrowDown: MoveDown
+  };
+
 
   constructor(private formBuilder: FormBuilder) {
     this.dynamicForm = formBuilder.group({});
@@ -113,12 +127,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // protected fieldsWidths = [
-  //   { title: 'Full Width', className: 'col-span-full' },
-  //   { title: 'One Third Width', className: 'col-span-1' },
-  //   { title: 'Two Third Width', className: 'col-span-2' },
-  // ];
-
   protected fieldsWidths = [
     { title: 'Full Width', className: 'col-span-12' },
     { title: 'Two Third Width', className: 'md:col-span-8' },
@@ -155,9 +163,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     this.showOverlay.set(!this.showOverlay());
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.fields, event.previousIndex, event.currentIndex);
-  }
 
   saveField() {
     const { fieldName, fieldType, fieldPlaceholder, fieldOptions, fieldWidth } = this.fieldForm.value;
@@ -176,7 +181,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     this.fieldModal();
   }
 
-  protected editedField!: DynamicField | null;
 
   editField(field: DynamicField) {
     this.fieldForm.patchValue({
@@ -219,30 +223,47 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
 
   // In your .ts file
-isSidebarOpen: boolean = false;
+  isSidebarOpen: boolean = false;
 
-toggleSidebar() {
-  this.isSidebarOpen = !this.isSidebarOpen;
-}
-
-screenIsSmall(): boolean {
-  return window.innerWidth < 768;
-}
-
-protected generatedCode: string = '';
-
-
-ngAfterViewInit(): void {
-  setTimeout(() => {
-    this.generateCode();
-  });
-}
-
-generateCode(): void {
-  if (this.codeGenerator) {
-    this.generatedCode = this.codeGenerator.generateCode(this.fields);
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
   }
-}
+
+  screenIsSmall(): boolean {
+    return window.innerWidth < 768;
+  }
+
+
+
+  ngAfterViewInit(): void {
+    // setTimeout(() => {
+    //   this.generateCode();
+    // });
+  }
+
+  generateCode(): void {
+
+    if (this.codeGenerator) {
+      this.generatedCode = this.codeGenerator.generateCode(this.fields);
+      console.log(this.generatedCode);
+    }
+  }
+
+  moveFieldUp(index: number) {
+    if (index > 0) {
+      const temp = this.fields[index];
+      this.fields[index] = this.fields[index - 1];
+      this.fields[index - 1] = temp;
+    }
+  }
+
+  moveFieldDown(index: number) {
+    if (index < this.fields.length - 1) {
+      const temp = this.fields[index];
+      this.fields[index] = this.fields[index + 1];
+      this.fields[index + 1] = temp;
+    }
+  }
 
 
 

@@ -4,8 +4,8 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-code-generator',
   imports: [CommonModule],
-  templateUrl: './code-generator.component.html',
-  styleUrl: './code-generator.component.css'
+  template: '',
+  styles: []
 })
 export class CodeGeneratorComponent {
 
@@ -14,7 +14,7 @@ export class CodeGeneratorComponent {
     let code = `<form class="grid grid-cols-1 sm:grid-cols-12 md:grid-cols-12 gap-4 p-4 w-full">\n`;
 
     fields.forEach((field:any) => {
-      const widthClass = field.width || 'col-span-12';
+      const widthClass = `${field.width} grid-cols-12`;
       const baseClass = `p-4 ${field.type === 'blank' ? '!bg-transparent' : 'transition-shadow hover:shadow-xl shadow-lg rounded-xl bg-white'}`;
 
       code += `  <div class="${widthClass} ${baseClass}">\n`;
@@ -61,7 +61,7 @@ export class CodeGeneratorComponent {
     });
 
     code += `</form>`;
-    
+
     return code;
   }
 }

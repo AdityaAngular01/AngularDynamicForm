@@ -1,11 +1,21 @@
 import { CommonModule, LowerCasePipe, TitleCasePipe } from '@angular/common';
-import { AfterViewInit, Component, OnInit, signal, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { LucideAngularModule, Menu, Move, MoveDown, MoveUp, SquarePen, Trash, X } from 'lucide-angular';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, signal, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, ValidatorFn } from '@angular/forms';
+import { LucideAngularModule, Menu, Move, MoveDown, MoveUp, Settings2, SquarePen, Trash, X } from 'lucide-angular';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CodeGeneratorComponent } from './code-generator/code-generator.component';
 
 type inputType = 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'radio' | 'select' | 'checkbox' | 'date' | 'blank';
+
+interface IValidations {
+  required?: boolean;
+  email?: boolean;
+  pattern?: string;
+  min?: number;
+  max?: number;
+  maxLength?: number;
+  minLength?: number;
+}
 
 interface DynamicField {
   name: string;
@@ -13,6 +23,7 @@ interface DynamicField {
   options?: string[] | undefined | null;
   placeholder?: string | undefined | null;
   width?: string; // Now using col-span-* for grid layout
+  validations?: IValidations
 }
 
 @Component({
@@ -46,8 +57,13 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
   protected dynamicForm!: FormGroup;
   protected fieldForm!: FormGroup;
+  protected validationForm!: FormGroup;
+
 
   protected editedField!: DynamicField | null;
+
+  protected validationOnFieldIndex: number = 0;
+  protected isValidationFormOpen: boolean = false;
 
   protected icons = {
     edit: SquarePen,
@@ -56,17 +72,21 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     closeMenu: X,
     drag: Move,
     arrowUp: MoveUp,
-    arrowDown: MoveDown
+    arrowDown: MoveDown,
+    validations: Settings2
   };
 
-
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
     this.dynamicForm = formBuilder.group({});
   }
 
   ngOnInit(): void {
     this.initFieldForm();
+    this.initValidationForm();
+    this.initDummyform();
+  }
 
+  private initDummyform() {
     const initialFields: DynamicField[] = [
       {
         name: 'full Name',
@@ -126,19 +146,9 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
     initialFields.forEach(f => {
       this.fields.push(f);
-      this.dynamicForm.addControl(f.name, this.formBuilder.control('', Validators.required));
+      this.dynamicForm.addControl(f.name, this.formBuilder.control(''));
     });
   }
-
-  protected fieldsWidths = [
-    { title: 'Full Width', className: 'col-span-12' },
-    { title: 'Two Third Width', className: 'md:col-span-8' },
-    { title: 'Half Width', className: 'md:col-span-6' },
-    { title: 'One Third Width', className: 'md:col-span-4' },
-    { title: 'One Fourth Width', className: 'md:col-span-3' }
-  ];
-
-
 
   private initFieldForm() {
     this.fieldForm = this.formBuilder.group({
@@ -162,6 +172,26 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private initValidationForm() {
+    this.validationForm = this.formBuilder.group({
+      required: [false],
+      email: [false],
+      minLength: [''],
+      maxLength: [''],
+      pattern: [''],
+      min: [''],
+      max: ['']
+    });
+  }
+
+  protected fieldsWidths = [
+    { title: 'Full Width', className: 'col-span-12' },
+    { title: 'Two Third Width', className: 'md:col-span-8' },
+    { title: 'Half Width', className: 'md:col-span-6' },
+    { title: 'One Third Width', className: 'md:col-span-4' },
+    { title: 'One Fourth Width', className: 'md:col-span-3' }
+  ];
+
   fieldModal() {
     this.isSidebarOpen = false;
     this.showOverlay.set(!this.showOverlay());
@@ -180,7 +210,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     };
 
     this.fields.push(newField);
-    this.dynamicForm.addControl(fieldName, this.formBuilder.control('', Validators.required));
+    this.dynamicForm.addControl(fieldName, this.formBuilder.control(''));
     this.fieldForm.reset();
     this.fieldModal();
   }
@@ -211,12 +241,13 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
       type: fieldType,
       placeholder: fieldPlaceholder,
       options: ['select', 'radio', 'checkbox'].includes(fieldType) ? fieldOptions.split(',').map((f: string) => f.trim()) : undefined,
-      width: fieldWidth
+      width: fieldWidth,
+      validations: this.editedField?.validations
     };
 
     if (this.editedField?.name !== field.name) {
       this.dynamicForm.removeControl(this.editedField?.name as string);
-      this.dynamicForm.addControl(field.name, this.formBuilder.control('', Validators.required));
+      this.dynamicForm.addControl(field.name, this.formBuilder.control(''));
     }
 
     this.fields[this.fields.indexOf(this.editedField!)] = field;
@@ -236,16 +267,28 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit(): void {
-    // setTimeout(() => {
-    //   this.generateCode();
-    // });
+    setTimeout(() => {
+      // this.generateCode();
+      this.cdr.detectChanges();
+    });
   }
 
   generateCode(): void {
 
     if (this.codeGenerator) {
       this.generatedCode = this.codeGenerator.generateCode(this.fields);
-      console.log(this.generatedCode);
+      this.copyGeneratedCode();
+    }
+  }
+
+  copyGeneratedCode() {
+    if (this.generatedCode) {
+      navigator.clipboard.writeText(this.generatedCode).then(() => {
+        alert('Code copied to clipboard!');
+      }).catch(err => {
+        alert('Failed to copy code.');
+        console.error(err);
+      });
     }
   }
 
@@ -266,4 +309,47 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
   }
 
 
+  private async generateValidatorsFromForm(): Promise<ValidatorFn[]> {
+    const val = this.validationForm.value;
+    const validators: ValidatorFn[] = [];
+
+    if (val.required) validators.push(Validators.required);
+    if (val.email) validators.push(Validators.email);
+    if (val.minLength) validators.push(Validators.minLength(+val.minLength));
+    if (val.maxLength) validators.push(Validators.maxLength(+val.maxLength));
+    if (val.min) validators.push(Validators.min(+val.min));
+    if (val.max) validators.push(Validators.max(+val.max));
+    if (val.pattern) validators.push(Validators.pattern(val.pattern));
+
+    return validators;
+  }
+
+  resetValidation() {
+    this.validationOnFieldIndex = 0;
+    this.validationForm.reset();
+  }
+  toggleValidationForm(index?: number) {
+    this.validationOnFieldIndex = index || 0;
+    this.validationForm.patchValue(this.fields[index || 0].validations!)
+    this.isValidationFormOpen = !this.isValidationFormOpen;
+  }
+
+  closeModal() {
+    this.toggleValidationForm();
+    this.resetValidation();
+  }
+
+  async applyValidation() {
+    this.dynamicForm.get(this.fields[this.validationOnFieldIndex].name)?.addValidators(await this.generateValidatorsFromForm());
+    this.fields[this.validationOnFieldIndex] = { ...this.fields[this.validationOnFieldIndex], validations: this.validationForm.value }
+    this.closeModal();
+  }
+
+  onSubmitForm() {
+    if (this.dynamicForm.invalid) {
+      alert("invalid form");
+      return;
+    }
+    alert("form submitted")
+  }
 }

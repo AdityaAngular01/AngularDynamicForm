@@ -36,6 +36,9 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
   protected showOverlay = signal<boolean>(false);
   protected showSelect = signal<boolean>(false);
 
+  protected isSidebarOpen: boolean = false;
+
+
   protected fields: DynamicField[] = [];
   protected inputTypes: inputType[] = ['text', 'email', 'password', 'tel', 'url', 'date', 'search', 'radio', 'select', 'checkbox', 'blank'];
 
@@ -137,7 +140,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
 
 
-  initFieldForm() {
+  private initFieldForm() {
     this.fieldForm = this.formBuilder.group({
       fieldName: ['', Validators.required],
       fieldType: ['', Validators.required],
@@ -160,6 +163,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
   }
 
   fieldModal() {
+    this.isSidebarOpen = false;
     this.showOverlay.set(!this.showOverlay());
   }
 
@@ -190,6 +194,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
       fieldOptions: field.options?.join(', '),
       fieldWidth: field.width
     });
+    this.isSidebarOpen = false;
     this.editedField = field;
     this.fieldModal();
   }
@@ -219,11 +224,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     this.fieldModal();
   }
 
-
-
-
-  // In your .ts file
-  isSidebarOpen: boolean = false;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -264,7 +264,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
       this.fields[index + 1] = temp;
     }
   }
-
 
 
 }

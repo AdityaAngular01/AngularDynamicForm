@@ -2,12 +2,11 @@ import { CommonModule, LowerCasePipe, TitleCasePipe } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, signal, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, ValidatorFn } from '@angular/forms';
 import { LucideAngularModule, Menu, Move, MoveDown, MoveUp, Settings2, SquarePen, Trash, X } from 'lucide-angular';
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CodeGeneratorComponent } from './code-generator/code-generator.component';
 
 type inputType = 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'radio' | 'select' | 'checkbox' | 'date' | 'blank';
 
-interface IValidations {
+export interface IValidations {
   required?: boolean;
   email?: boolean;
   pattern?: string;
@@ -17,7 +16,7 @@ interface IValidations {
   minLength?: number;
 }
 
-interface DynamicField {
+export interface DynamicField {
   name: string;
   type: inputType;
   options?: string[] | undefined | null;
@@ -32,7 +31,6 @@ interface DynamicField {
     ReactiveFormsModule,
     TitleCasePipe,
     CommonModule,
-    DragDropModule,
     FormsModule,
     LowerCasePipe,
     LucideAngularModule,
@@ -287,6 +285,8 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     if (this.codeGenerator) {
       this.generatedCode = this.codeGenerator.generateCode(this.fields);
       this.copyGeneratedCode();
+      console.log(this.codeGenerator.generateTsCode(this.fields));
+
     }
   }
 
@@ -320,17 +320,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
   private async generateValidatorsFromForm(): Promise<ValidatorFn[]> {
     const val = this.validationForm.value;
-    const validators: ValidatorFn[] = [];
-
-    if (val.required) validators.push(Validators.required);
-    if (val.email) validators.push(Validators.email);
-    if (val.minLength) validators.push(Validators.minLength(+val.minLength));
-    if (val.maxLength) validators.push(Validators.maxLength(+val.maxLength));
-    if (val.min) validators.push(Validators.min(+val.min));
-    if (val.max) validators.push(Validators.max(+val.max));
-    if (val.pattern) validators.push(Validators.pattern(val.pattern));
-
-    return validators;
+    return await this.codeGenerator.generateValidators(val)
   }
 
   resetValidation() {

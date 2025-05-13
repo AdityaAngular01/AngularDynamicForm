@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { DynamicField, IValidations } from '../dynamic-form.component';
+import { ValidatorFn, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-code-generator',
@@ -16,10 +18,10 @@ export class CodeGeneratorComponent {
   }
 
 
-  generateCode(fields:any) {
+  generateCode(fields:DynamicField[]) {
     let code = `<form class="grid grid-cols-1 sm:grid-cols-12 md:grid-cols-12 gap-4 p-4 w-full">\n`;
 
-    fields.forEach((field:any) => {
+    fields.forEach((field:DynamicField) => {
       const widthClass = `${field.width} grid-cols-12`;
       const baseClass = `p-4 ${field.type === 'blank' ? '!bg-transparent' : 'transition-shadow hover:shadow-xl shadow-lg rounded-xl bg-white'}`;
 
@@ -67,6 +69,54 @@ export class CodeGeneratorComponent {
     });
 
     code += `</form>`;
+
+    return code;
+  }
+
+
+
+  async generateValidators(val:IValidations): Promise<ValidatorFn[]> {
+    const validators: ValidatorFn[] = [];
+    if(!val) return validators;
+    if (val.required) validators.push(Validators.required);
+    if (val.email) validators.push(Validators.email);
+    if (val.minLength) validators.push(Validators.minLength(+val.minLength));
+    if (val.maxLength) validators.push(Validators.maxLength(+val.maxLength));
+    if (val.min) validators.push(Validators.min(+val.min));
+    if (val.max) validators.push(Validators.max(+val.max));
+    if (val.pattern) validators.push(Validators.pattern(val.pattern));
+
+    return validators;
+  }
+
+  private generateTsValidatorsString(validations?: IValidations): string {
+    const validators: string[] = [];
+    if (!validations) return '';
+
+    if (validations.required) validators.push('Validators.required');
+    if (validations.email) validators.push('Validators.email');
+    if (validations.minLength) validators.push(`Validators.minLength(${validations.minLength})`);
+    if (validations.maxLength) validators.push(`Validators.maxLength(${validations.maxLength})`);
+    if (validations.min) validators.push(`Validators.min(${validations.min})`);
+    if (validations.max) validators.push(`Validators.max(${validations.max})`);
+    if (validations.pattern) validators.push(`Validators.pattern('${validations.pattern}')`);
+
+    return validators.length > 0 ? `[${validators.join(', ')}]` : '';
+  }
+
+  // Generate form TS code
+  generateTsCode(fields: DynamicField[]) {
+    let code = `protected form!: FormGroup;\n`;
+    code += `constructor(private fb: FormBuilder) {}\n\n`;
+    code += `ngOnInit() {\n  this.initForm();\n}\n\n`;
+    code += `initForm() {\n  this.form = this.fb.group({\n`;
+
+    fields.forEach(field => {
+      const validatorsStr = this.generateTsValidatorsString(field.validations);
+      code += `    ${field.name}: ['', ${validatorsStr}],\n`;
+    });
+
+    code += `  });\n}\n`;
 
     return code;
   }

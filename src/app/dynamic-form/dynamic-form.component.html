@@ -41,6 +41,7 @@
 
       <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 w-full">
         <div *ngFor="let field of fields" [ngClass]="[
+          'col-span-12',
           field.width || 'col-span-12',
           'p-4',
           field.type === 'blank'? '!bg-transparent':'transition-shadow hover:shadow-xl shadow-lg rounded-xl bg-white'
@@ -167,6 +168,7 @@
 
   <!-- Code Preview -->
   <pre class="max-w-dvw overflow-auto max-h-96 p-4" *ngIf="generatedCode">{{ generatedCode }}</pre>
+  <app-code-generator></app-code-generator>
 </section>
 
 <!-- <div class="p-4">

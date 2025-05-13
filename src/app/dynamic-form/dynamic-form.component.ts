@@ -347,6 +347,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
   onSubmitForm() {
     if (this.dynamicForm.invalid) {
+      this.dynamicForm.markAllAsTouched();
       alert("invalid form");
       return;
     }

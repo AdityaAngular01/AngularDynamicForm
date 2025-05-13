@@ -9,6 +9,12 @@ import { Component } from '@angular/core';
 })
 export class CodeGeneratorComponent {
 
+  titleCaseConverter(str:string){
+    return str.split(' ').map((word:string)=>{
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }).join(' ');
+  }
+
 
   generateCode(fields:any) {
     let code = `<form class="grid grid-cols-1 sm:grid-cols-12 md:grid-cols-12 gap-4 p-4 w-full">\n`;
@@ -20,7 +26,7 @@ export class CodeGeneratorComponent {
       code += `  <div class="${widthClass} ${baseClass}">\n`;
 
       if (field.type !== 'blank') {
-        code += `    <label class="block mb-2 font-semibold text-gray-800">${field.name.toUpperCase()}</label>\n`;
+        code += `    <label class="block mb-2 font-semibold text-gray-800">${this.titleCaseConverter(field.name)}</label>\n`;
 
         if (['text', 'email', 'password', 'tel', 'url', 'search', 'date'].includes(field.type)) {
           code += `    <input type="${field.type}" placeholder="${field.placeholder || ''}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />\n`;

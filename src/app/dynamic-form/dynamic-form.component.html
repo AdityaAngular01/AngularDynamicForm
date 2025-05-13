@@ -44,8 +44,7 @@
 
     <div class="flex-1 overflow-y-auto w-full p-4">
       <div class="flex justify-end mb-4">
-        <button (click)="generateCode()" class="px-4 py-2 bg-black text-white rounded hover:bg-gray-900">Generate
-          Code</button>
+        <button (click)="generateCode()" class="px-4 py-2 text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Copy HTML + Tailwind</button>
       </div>
 
       <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -96,11 +95,17 @@
             <!-- Input Types -->
             <input *ngIf="['text', 'email', 'password', 'tel', 'url', 'search', 'date'].includes(field.type)"
               [type]="field.type" [formControlName]="field.name" [placeholder]="field.placeholder"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" [ngClass]="{
+                'border-red-500 ring-red-500': dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched,
+                'border-gray-300 focus:ring-blue-400': !(dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched)
+              }"/>
 
             <!-- Select -->
             <select *ngIf="field.type === 'select'" [formControlName]="field.name"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"[ngClass]="{
+                'border-red-500 ring-red-500': dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched,
+                'border-gray-300 focus:ring-blue-400': !(dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched)
+              }">
               <option value="" selected disabled>Select {{field.name}}</option>
               <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
             </select>
@@ -108,7 +113,9 @@
             <!-- Radio -->
             <div *ngIf="field.type === 'radio'" class="flex flex-wrap gap-4 mt-3">
               <label *ngFor="let opt of field.options" class="inline-flex items-center gap-2">
-                <input type="radio" [value]="opt" [formControlName]="field.name" />
+                <input type="radio" [value]="opt" [formControlName]="field.name" [ngClass]="{
+                  'ring-2 ring-red-500': dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched
+                }"/>
                 <span>{{ opt }}</span>
               </label>
             </div>
@@ -139,11 +146,11 @@
     (click)="fieldModal()">
     + Add Field
   </button>
-  <div class="max-w-screen-xl mx-auto mt-6 px-4">
+  <!-- <div class="max-w-screen-xl mx-auto mt-6 px-4">
     <pre class="bg-black text-white p-4 rounded-lg overflow-auto max-h-96 shadow-inner text-sm" *ngIf="generatedCode">
       {{ generatedCode }}
     </pre>
-  </div>
+  </div> -->
 
   <!-- Add Field Modal -->
   @if(showOverlay()) {

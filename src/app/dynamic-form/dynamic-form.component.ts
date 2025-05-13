@@ -52,6 +52,13 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
   protected fields: DynamicField[] = [];
   protected inputTypes: inputType[] = ['text', 'email', 'password', 'tel', 'url', 'date', 'search', 'radio', 'select', 'checkbox', 'blank'];
+  protected fieldsWidths = [
+    { title: 'Full Width', className: 'col-span-12' },
+    { title: 'Two Third Width', className: 'md:col-span-8' },
+    { title: 'Half Width', className: 'md:col-span-6' },
+    { title: 'One Third Width', className: 'md:col-span-4' },
+    { title: 'One Fourth Width', className: 'md:col-span-3' }
+  ];
 
   protected generatedCode: string = '';
 
@@ -75,6 +82,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     arrowDown: MoveDown,
     validations: Settings2
   };
+
 
   constructor(private formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
     this.dynamicForm = formBuilder.group({});
@@ -184,17 +192,20 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  protected fieldsWidths = [
-    { title: 'Full Width', className: 'col-span-12' },
-    { title: 'Two Third Width', className: 'md:col-span-8' },
-    { title: 'Half Width', className: 'md:col-span-6' },
-    { title: 'One Third Width', className: 'md:col-span-4' },
-    { title: 'One Fourth Width', className: 'md:col-span-3' }
-  ];
-
-  fieldModal() {
+  protected fieldModal() {
     this.isSidebarOpen = false;
     this.showOverlay.set(!this.showOverlay());
+  }
+
+  protected clearDummyForm(){
+    let interval = setInterval(() => {
+      if (this.fields.length > 0) {
+        this.fields.pop();
+      } else {
+        clearInterval(interval);
+      }
+    }, 500);
+
   }
 
 
@@ -263,8 +274,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
   screenIsSmall(): boolean {
     return window.innerWidth < 768;
   }
-
-
 
   ngAfterViewInit(): void {
     setTimeout(() => {
@@ -340,7 +349,9 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
   }
 
   async applyValidation() {
-    this.dynamicForm.get(this.fields[this.validationOnFieldIndex].name)?.addValidators(await this.generateValidatorsFromForm());
+    const controlName = this.fields[this.validationOnFieldIndex].name;
+    this.dynamicForm.get(controlName)?.clearValidators();
+    this.dynamicForm.get(controlName)?.addValidators(await this.generateValidatorsFromForm());
     this.fields[this.validationOnFieldIndex] = { ...this.fields[this.validationOnFieldIndex], validations: this.validationForm.value }
     this.closeModal();
   }

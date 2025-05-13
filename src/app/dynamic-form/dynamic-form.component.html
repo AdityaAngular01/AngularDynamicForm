@@ -23,7 +23,10 @@
       class="fixed inset-y-0 left-0 z-40 md:z-20 w-72 transform bg-white border-r border-gray-200 p-4 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:block h-screen overflow-y-auto shadow-lg"
       [class.-translate-x-full]="!isSidebarOpen" [class.block]="isSidebarOpen"
       [class.hidden]="!isSidebarOpen && screenIsSmall()">
-      <h2 class="text-xl font-bold text-gray-800 mb-4">Form Fields</h2>
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Form Fields</h2>
+        <button class="text-xs mb-4 text-red-600 cursor-pointer bg-red-200 rounded-2xl px-2 py-1" (click)="clearDummyForm()">Clear All</button>
+      </div>
 
       <div class="space-y-4">
         <div *ngFor="let field of fields; index as i; first as f; last as l"
@@ -44,7 +47,7 @@
 
     <div class="flex-1 overflow-y-auto w-full p-4">
       <div class="flex justify-end mb-4">
-        <button (click)="generateCode()" class="px-4 py-2 text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Copy HTML + Tailwind</button>
+        <button (click)="generateCode()" class="px-4 py-2 text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy HTML + Tailwind</button>
       </div>
 
       <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -132,7 +135,7 @@
         </div>
 
         <!-- Submit Button -->
-        <div class="col-span-full mt-6">
+        <div class="col-span-full mt-6" [ngClass]="{'hidden': !fields.length}">
           <button type="submit"
             class="w-full bg-green-600 text-white py-2 px-6 rounded-md font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed" (click)="onSubmitForm()">
             Submit

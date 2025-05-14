@@ -224,7 +224,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
       } else {
         clearInterval(interval);
       }
-    }, 500);
+    }, 33);
 
   }
 

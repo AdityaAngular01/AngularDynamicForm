@@ -4,11 +4,6 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: ()=> import("./dynamic-form/dynamic-form.component").then(component=> component.DynamicFormComponent),
-    title: "Angular Dynamic Form Generator"
+    title: "Dynamic Form Generator"
   },
-  // {
-  //   path: '',
-  //   pathMatch: 'full',
-  //   redirectTo: 'Dynamic-Form'
-  // }
 ];

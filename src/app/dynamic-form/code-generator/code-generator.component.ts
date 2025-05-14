@@ -73,7 +73,13 @@ export class CodeGeneratorComponent {
       code += `  </div>\n`;
     });
 
-    code += `</form>`;
+    code += `<div class="col-span-full mt-6">
+    <button type="submit"
+      class="w-full bg-green-600 text-white py-2 px-6 rounded-md font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+      Submit
+    </button>
+  </div>
+</form>`;
 
     return code;
   }
@@ -111,17 +117,33 @@ export class CodeGeneratorComponent {
 
   // Generate form TS code
   generateTsCode(fields: DynamicField[]) {
-    let code = `protected form!: FormGroup;\n`;
-    code += `constructor(private fb: FormBuilder) {}\n\n`;
-    code += `ngOnInit() {\n  this.initForm();\n}\n\n`;
-    code += `initForm() {\n  this.form = this.fb.group({\n`;
+
+    let code = `
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'my-app',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+})
+export class AppComponent implements OnInit {
+  protected form!: FormGroup;
+  constructor(private fb: FormBuilder) {}
+  ngOnInit() {
+    this.initForm();
+  }
+  initForm() {
+    this.form = this.fb.group({\n`;
 
     fields.forEach(field => {
       const validatorsStr = this.generateTsValidatorsString(field.validations);
-      code += `    ${field.name}: ['', ${validatorsStr}],\n`;
+      code += `        ${field.name}: ['', ${validatorsStr}],\n`;
     });
 
-    code += `  });\n}\n`;
+    code += `     });
+  }
+}`;
 
     return code;
   }
@@ -179,7 +201,16 @@ export class CodeGeneratorComponent {
       code += `  </div>\n`;
     });
 
-    code += `</form>`;
+    code += `
+  <div class="col-span-full mt-6">
+    <button type="submit"
+      [disabled]="form.invalid"
+      class="w-full bg-green-600 text-white py-2 px-6 rounded-md font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
+      Submit
+    </button>
+  </div>
+</form>
+    `;
     return code;
   }
 }

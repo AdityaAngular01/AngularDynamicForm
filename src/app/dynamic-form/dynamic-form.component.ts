@@ -278,9 +278,6 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
       validations: this.editedField?.validations
     };
 
-    console.log(field);
-
-
     if (this.editedField?.name !== field.name) {
       this.dynamicForm.removeControl(this.editedField?.name as string);
       this.dynamicForm.addControl(field.name, this.formBuilder.control(''));
@@ -305,6 +302,12 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
       // this.generateCode();
       this.cdr.detectChanges();
     });
+  }
+
+  addNewField(){
+    this.editedField = null;
+    this.fieldForm.reset();
+    this.fieldModal();
   }
 
   generateCode(type:'HTML_Taiwind' | 'HTML_Taiwind_Angular' | 'Angular_TS'): void {

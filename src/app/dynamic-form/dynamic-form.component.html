@@ -35,7 +35,7 @@
 
           <!-- Field Info -->
           <div class="flex-1">
-            <p class="text-base font-semibold text-gray-800 truncate">{{ field.name | titlecase }}</p>
+            <p class="text-base font-semibold text-gray-800 truncate">{{ field.title | titlecase }}</p>
             <p class="text-sm text-gray-500">Type: {{ field.type }}</p>
           </div>
 
@@ -47,7 +47,9 @@
 
     <div class="flex-1 overflow-y-auto w-full p-4">
       <div class="flex justify-end mb-4">
-        <button (click)="generateCode()" class="px-4 py-2 text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy HTML + Tailwind</button>
+        <button (click)="generateCode('HTML_Taiwind')" class="px-4 py-2 text-gray-900 text-xs focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy HTML + Tailwind</button>
+        <button (click)="generateCode('HTML_Taiwind_Angular')" class="px-4 py-2 text-gray-900 text-xs focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy HTML + Tailwind(Angular)</button>
+        <button (click)="generateCode('Angular_TS')" class="px-4 py-2 text-gray-900 text-xs focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy TS(Angular)</button>
       </div>
 
       <form [formGroup]="dynamicForm" class="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -60,7 +62,7 @@
           <section [ngClass]="field.type === 'blank' ? 'hidden' : ''">
             <section class="flex justify-between items-center">
 
-              <label class="block mb-2 font-semibold text-gray-800">{{ field.name | titlecase }}</label>
+              <label class="block mb-2 font-semibold text-gray-800">{{ field.title | titlecase }}</label>
 
               <!-- Action Buttons -->
               <div class="flex items-center justify-center gap-2 text-gray-500">
@@ -149,11 +151,6 @@
     (click)="fieldModal()">
     + Add Field
   </button>
-  <!-- <div class="max-w-screen-xl mx-auto mt-6 px-4">
-    <pre class="bg-black text-white p-4 rounded-lg overflow-auto max-h-96 shadow-inner text-sm" *ngIf="generatedCode">
-      {{ generatedCode }}
-    </pre>
-  </div> -->
 
   <!-- Add Field Modal -->
   @if(showOverlay()) {

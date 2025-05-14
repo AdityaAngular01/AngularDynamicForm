@@ -17,6 +17,7 @@ export interface IValidations {
 }
 
 export interface DynamicField {
+  title:string;
   name: string;
   type: inputType;
   options?: string[] | undefined | null;
@@ -49,7 +50,19 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
 
   protected fields: DynamicField[] = [];
-  protected inputTypes: inputType[] = ['text', 'email', 'password', 'tel', 'url', 'date', 'search', 'radio', 'select', 'checkbox', 'blank'];
+  protected inputTypes: inputType[] = [
+    'text',
+    'email',
+    'password',
+    'tel',
+    'url',
+    'date',
+    'search',
+    'radio',
+    'select',
+    'checkbox',
+    'blank'
+  ];
   protected fieldsWidths = [
     { title: 'Full Width', className: 'col-span-12' },
     { title: 'Two Third Width', className: 'md:col-span-8' },
@@ -92,57 +105,66 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     this.initDummyform();
   }
 
-  private initDummyform() {
+  private initDummyform() :void {
     const initialFields: DynamicField[] = [
       {
-        name: 'full Name',
+        title: 'full Name',
+        name: 'fullName',
         type: 'text',
         placeholder: 'Enter your full name',
         width: 'md:col-span-4'
       },
       {
+        title: 'email',
         name: 'email',
         type: 'email',
         placeholder: 'Enter your email',
         width: 'md:col-span-4'
       },
       {
+        title: 'password',
         name: 'password',
         type: 'password',
         placeholder: 'Enter your password',
         width: 'md:col-span-4'
       },
       {
-        name: 'Phone Number',
+        title: 'Phone Number',
+        name: 'phoneNumber',
         type: 'tel',
         placeholder: 'Enter your phone number',
         width: 'md:col-span-6'
       },
       {
+        title: 'website',
         name: 'website',
         type: 'url',
         placeholder: 'Enter your website URL',
         width: 'md:col-span-6'
       },
       {
-        name: 'search Query',
+        title: 'search Query',
+        name: 'searchQuery',
         type: 'search',
         placeholder: 'Search here',
         width: 'md:col-span-4'
       },
       {
+        title: 'gender',
         name: 'gender',
         type: 'radio',
         options: ['Male', 'Female', 'Other'],
         width: 'md:col-span-8'
       },
       {
+        title: 'country',
         name: 'country',
         type: 'select',
         options: ['USA', 'India', 'Germany'],
         width: 'md:col-span-4'
       },
       {
+        title: 'subscribe',
         name: 'subscribe',
         type: 'checkbox',
         options: ['Yes', 'No'],
@@ -156,7 +178,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private initFieldForm() {
+  private initFieldForm() :void  {
     this.fieldForm = this.formBuilder.group({
       fieldName: ['', Validators.required],
       fieldType: ['', Validators.required],
@@ -178,7 +200,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private initValidationForm() {
+  private initValidationForm() :void {
     this.validationForm = this.formBuilder.group({
       required: [false],
       email: [false],
@@ -190,12 +212,12 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  protected fieldModal() {
+  protected fieldModal() :void {
     this.isSidebarOpen = false;
     this.showOverlay.set(!this.showOverlay());
   }
 
-  protected clearDummyForm(){
+  protected clearDummyForm() : void{
     let interval = setInterval(() => {
       if (this.fields.length > 0) {
         this.fields.pop();
@@ -207,11 +229,12 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
   }
 
 
-  saveField() {
+  async saveField() {
     const { fieldName, fieldType, fieldPlaceholder, fieldOptions, fieldWidth } = this.fieldForm.value;
 
     const newField: DynamicField = {
-      name: fieldName,
+      title: fieldName,
+      name: await this.codeGenerator.fieldNameConverter(fieldName),
       type: fieldType,
       placeholder: fieldPlaceholder,
       options: ['select', 'radio', 'checkbox'].includes(fieldType) ? fieldOptions.split(",").map((f: string) => f.trim()) : undefined,
@@ -227,7 +250,7 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
 
   editField(field: DynamicField) {
     this.fieldForm.patchValue({
-      fieldName: field.name,
+      fieldName: field.title,
       fieldType: field.type,
       fieldPlaceholder: field.placeholder,
       fieldOptions: field.options?.join(', '),
@@ -243,16 +266,20 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     this.fields.splice(index, 1);
   }
 
-  onSaveEditedField() {
+  async onSaveEditedField() {
     const { fieldName, fieldType, fieldPlaceholder, fieldOptions, fieldWidth } = this.fieldForm.value;
     const field: DynamicField = {
-      name: fieldName,
+      title: fieldName,
+      name: await this.codeGenerator.fieldNameConverter(fieldName),
       type: fieldType,
       placeholder: fieldPlaceholder,
       options: ['select', 'radio', 'checkbox'].includes(fieldType) ? fieldOptions.split(',').map((f: string) => f.trim()) : undefined,
       width: fieldWidth,
       validations: this.editedField?.validations
     };
+
+    console.log(field);
+
 
     if (this.editedField?.name !== field.name) {
       this.dynamicForm.removeControl(this.editedField?.name as string);
@@ -280,13 +307,17 @@ export class DynamicFormComponent implements OnInit, AfterViewInit {
     });
   }
 
-  generateCode(): void {
+  generateCode(type:'HTML_Taiwind' | 'HTML_Taiwind_Angular' | 'Angular_TS'): void {
 
-    if (this.codeGenerator) {
+    if (this.codeGenerator && type === 'HTML_Taiwind') {
       this.generatedCode = this.codeGenerator.generateCode(this.fields);
       this.copyGeneratedCode();
-      console.log(this.codeGenerator.generateTsCode(this.fields));
-
+    }else if(this.codeGenerator && type === 'HTML_Taiwind_Angular'){
+      this.generatedCode = this.codeGenerator.generateAngularHTMLCode(this.fields);
+      this.copyGeneratedCode();
+    }else if(this.codeGenerator && type === 'Angular_TS'){
+      this.generatedCode = this.codeGenerator.generateTsCode(this.fields);
+      this.copyGeneratedCode();
     }
   }
 

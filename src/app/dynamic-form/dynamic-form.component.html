@@ -1,13 +1,13 @@
-<nav class="w-full fixed top-0 left-0 z-40 bg-white border-b border-gray-200 shadow-md">
+<nav class="w-full fixed top-0 left-0 z-40 bg-white border-b border-gray-200 dark:bg-gray-800 shadow-md">
   <div class="flex items-center justify-between px-4 py-3 md:px-6">
-    <div class="text-2xl font-bold text-blue-700">Dynamic Form Builder</div>
+    <div class="text-2xl font-bold text-blue-700 dark:text-gray-50">Dynamic Form Builder</div>
 
-    <!-- <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+    <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600 dark:text-gray-50">
       <li><a routerLink="/dashboard" routerLinkActive="text-blue-700 border-b-2 border-blue-700"
           class="hover:text-blue-700 transition">Dashboard</a></li>
       <li><a routerLink="/settings" routerLinkActive="text-blue-700 border-b-2 border-blue-700"
           class="hover:text-blue-700 transition">Settings</a></li>
-    </ul> -->
+    </ul>
 
     <button class="md:hidden px-4 py-2 rounded focus:outline-none" (click)="toggleSidebar()">
       <lucide-icon [img]="!isSidebarOpen? icons.menu : icons.closeMenu" class=" transition"></lucide-icon>
@@ -15,12 +15,12 @@
   </div>
 </nav>
 
-<section class="relative w-full min-h-screen bg-gray-100 pt-14">
+<section class="relative w-full min-h-screen bg-gray-100 dark:bg-gray-700 pt-14">
   <div class="min-h-screen flex flex-col md:flex-row">
 
     <!-- Sidebar -->
     <div
-      class="fixed inset-y-0 left-0 z-40 md:z-20 w-72 transform bg-white border-r border-gray-200 p-4 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:block h-screen overflow-y-auto shadow-lg"
+      class="fixed inset-y-0 left-0 z-40 md:z-20 w-72 transform bg-white dark:bg-gray-800 border-r border-gray-200 p-4 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:block h-screen overflow-y-auto shadow-lg"
       [class.-translate-x-full]="!isSidebarOpen" [class.block]="isSidebarOpen"
       [class.hidden]="!isSidebarOpen && screenIsSmall()">
       <div class="flex justify-between items-center">
@@ -30,13 +30,13 @@
 
       <div class="space-y-4">
         <div *ngFor="let field of fields; index as i; first as f; last as l"
-          class="p-4 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-3"
+          class="p-4 bg-white dark:bg-gray-700 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between gap-3"
           [ngClass]="{'mb-24': l}">
 
           <!-- Field Info -->
           <div class="flex-1">
-            <p class="text-base font-semibold text-gray-800 truncate">{{ field.title | titlecase }}</p>
-            <p class="text-sm text-gray-500">Type: {{ field.type }}</p>
+            <p class="text-base font-semibold text-gray-800 dark:text-gray-50 truncate">{{ field.title | titlecase }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-300">Type: {{ field.type }}</p>
           </div>
 
 
@@ -46,7 +46,7 @@
 
 
     <div class="flex-1 overflow-y-auto w-full p-4">
-      <div class="flex justify-end mb-4">
+      <div class="flex justify-end mb-4 gap-1">
         <button (click)="generateCode('HTML_Taiwind')" class="px-4 py-2 text-gray-900 text-xs focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy HTML + Tailwind</button>
         <button (click)="generateCode('HTML_Taiwind_Angular')" class="px-4 py-2 text-gray-900 text-xs focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy HTML + Tailwind(Angular)</button>
         <button (click)="generateCode('Angular_TS')" class="px-4 py-2 text-gray-900 text-xs focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" [ngClass]="{'hidden': !fields.length}">Copy TS(Angular)</button>
@@ -57,15 +57,15 @@
           'col-span-12',
           field.width || 'col-span-12',
           'p-4',
-          field.type === 'blank' ? '!bg-transparent' : 'bg-white shadow rounded-lg transition-shadow hover:shadow-xl'
+          field.type === 'blank' ? '!bg-transparent' : 'bg-white dark:bg-gray-800 shadow rounded-lg transition-shadow hover:shadow-xl'
         ]">
           <section [ngClass]="field.type === 'blank' ? 'hidden' : ''">
             <section class="flex justify-between items-center">
 
-              <label class="block mb-2 font-semibold text-gray-800">{{ field.title | titlecase }}</label>
+              <label class="block mb-2 font-semibold text-gray-800 dark:text-gray-50">{{ field.title | titlecase }}</label>
 
               <!-- Action Buttons -->
-              <div class="flex items-center justify-center gap-2 text-gray-500">
+              <div class="flex items-center justify-center gap-2 text-gray-500 dark:text-gray-300">
 
                 <!-- Up -->
                 <button type="button" [disabled]="f" (click)="moveFieldUp(i)"
@@ -90,7 +90,7 @@
                 </button>
 
                 <!-- Validations -->
-                <button type="button" class="text-gray-500 hover:text-blue-600 transition-colors duration-200" (click)="toggleValidationForm(i)">
+                <button type="button" class="hover:text-blue-600 transition-colors duration-200" (click)="toggleValidationForm(i)">
                   <lucide-icon [img]="icons.validations" class="w-4 h-4"></lucide-icon>
                 </button>
               </div>
@@ -100,19 +100,19 @@
             <!-- Input Types -->
             <input *ngIf="['text', 'email', 'password', 'tel', 'url', 'search', 'date'].includes(field.type)"
               [type]="field.type" [formControlName]="field.name" [placeholder]="field.placeholder"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" [ngClass]="{
+              class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" [ngClass]="{
                 'border-red-500 ring-red-500': dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched,
                 'border-gray-300 focus:ring-blue-400': !(dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched)
               }"/>
 
             <!-- Select -->
             <select *ngIf="field.type === 'select'" [formControlName]="field.name"
-              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"[ngClass]="{
+              class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:text-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"[ngClass]="{
                 'border-red-500 ring-red-500': dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched,
                 'border-gray-300 focus:ring-blue-400': !(dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched)
               }">
-              <option value="" selected disabled>Select {{field.name}}</option>
-              <option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</option>
+              <option value="" selected disabled class="dark:bg-gray-700">Select {{field.name}}</option>
+              <option *ngFor="let opt of field.options"  class="dark:bg-gray-700 dark:text-gray-100" [value]="opt">{{ opt }}</option>
             </select>
 
             <!-- Radio -->
@@ -121,7 +121,7 @@
                 <input type="radio" [value]="opt" [formControlName]="field.name" [ngClass]="{
                   'ring-2 ring-red-500': dynamicForm.get(field.name)?.invalid && dynamicForm.get(field.name)?.touched
                 }"/>
-                <span>{{ opt }}</span>
+                <span class="dark:text-gray-100">{{ opt }}</span>
               </label>
             </div>
 
@@ -130,7 +130,7 @@
               <div *ngFor="let opt of field.options; let i = index" class="flex items-center gap-2">
                 <input type="checkbox" [formControlName]="field.name" [value]="opt" id="{{ field.name + '_' + i }}"
                   class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                <label [for]="field.name + '_' + i" class="text-sm text-gray-700">{{ opt }}</label>
+                <label [for]="field.name + '_' + i" class="text-sm text-gray-700 dark:text-gray-100">{{ opt }}</label>
               </div>
             </div>
           </section>
@@ -154,37 +154,37 @@
 
   <!-- Add Field Modal -->
   @if(showOverlay()) {
-  <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center px-4 py-6">
-    <div class="bg-white w-full max-w-md md:max-w-lg p-6 rounded-2xl shadow-2xl space-y-6">
-      <h2 class="text-2xl font-bold text-gray-800">Add New Field</h2>
+  <div class="fixed inset-0 z-50 bg-gray-300 dark:bg-gray-700 bg-opacity-60 flex items-center justify-center px-4 py-6">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md md:max-w-lg p-6 rounded-2xl shadow-2xl space-y-6">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Add New Field</h2>
 
       <form [formGroup]="fieldForm" class="space-y-4">
         <!-- Field Name -->
         <div>
-          <label for="fieldName" class="block text-sm font-medium text-gray-700 mb-1">Field Name <span
+          <label for="fieldName" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Field Name <span
               class="text-red-600">*</span></label>
           <input type="text" id="fieldName" formControlName="fieldName"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:text-gray-200  rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="Enter field name" />
         </div>
 
         <!-- Field Type -->
         <div>
-          <label for="fieldType" class="block text-sm font-medium text-gray-700 mb-1">Field Type <span
+          <label for="fieldType" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Field Type <span
               class="text-red-600">*</span></label>
           <select id="fieldType" formControlName="fieldType"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option disabled selected value="">Select Field Type</option>
-            <option *ngFor="let field of inputTypes" [value]="field">{{field | titlecase}}</option>
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:text-gray-200  rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option disabled selected value="" class="dark:bg-gray-700 dark:text-gray-100">Select Field Type</option>
+            <option *ngFor="let field of inputTypes" [value]="field" class="dark:bg-gray-700 dark:text-gray-100">{{field | titlecase}}</option>
           </select>
         </div>
 
         <!-- Field Width -->
         <div>
-          <label for="fieldWidth" class="block text-sm font-medium text-gray-700 mb-1">Field Width</label>
+          <label for="fieldWidth" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Field Width</label>
           <select id="fieldWidth" formControlName="fieldWidth"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option *ngFor="let width of fieldsWidths; index as i" [value]="width.className" [selected]="i==0">
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:text-gray-200  rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <option *ngFor="let width of fieldsWidths;first as f" [value]="width.className" [selected]="f" class="dark:bg-gray-700 dark:text-gray-100">
               {{ width.title }}
             </option>
           </select>
@@ -193,9 +193,9 @@
         <!-- Placeholder -->
         @if(!showSelect()) {
         <div>
-          <label for="fieldPlaceholder" class="block text-sm font-medium text-gray-700 mb-1">Placeholder</label>
+          <label for="fieldPlaceholder" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Placeholder</label>
           <input type="text" id="fieldPlaceholder" formControlName="fieldPlaceholder"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             [placeholder]="'Enter placeholder for ' + ((fieldForm.get('fieldName')?.value || 'field') | lowercase) + '.'" />
         </div>
         }
@@ -203,17 +203,17 @@
         <!-- Options -->
         @if(showSelect()) {
         <div>
-          <label for="fieldOptions" class="block text-sm font-medium text-gray-700 mb-1">Enter Options <span
+          <label for="fieldOptions" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Enter Options <span
               class="text-red-600">*</span></label>
           <input type="text" id="fieldOptions" formControlName="fieldOptions"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 dark:text-gray-200  rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="Value1, Value2, Value3,..." />
         </div>
         }
 
         <!-- Modal Buttons -->
         <div class="flex justify-end gap-3 pt-4">
-          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition"
+          <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 rounded hover:bg-gray-200 transition"
             (click)="fieldModal()">Cancel</button>
           <button type="button"
             class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition"
@@ -227,13 +227,13 @@
   <app-code-generator></app-code-generator>
 
   <!-- Modal Background -->
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" *ngIf="isValidationFormOpen">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-300 dark:bg-gray-700 bg-opacity-50" *ngIf="isValidationFormOpen">
     <!-- Modal Content -->
-    <div class="bg-white rounded-lg shadow-lg max-w-xl w-full p-6 relative">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-xl w-full p-6 relative">
       <!-- Modal Header -->
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold text-gray-800">Validation Rules</h2>
-        <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 transition" aria-label="Close">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-50">Validation Rules</h2>
+        <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-red-600 transition" aria-label="Close">
           ✕
         </button>
       </div>
@@ -244,56 +244,56 @@
         <div class="flex items-center space-x-2">
           <input id="required" type="checkbox" formControlName="required"
             class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-          <label for="required" class="text-sm font-medium text-gray-700">Required</label>
+          <label for="required" class="text-sm font-medium text-gray-700 dark:text-gray-200">Required</label>
         </div>
 
         <!-- Email -->
         <div class="flex items-center space-x-2">
           <input id="email" type="checkbox" formControlName="email"
             class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-          <label for="email" class="text-sm font-medium text-gray-700">Email</label>
+          <label for="email" class="text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
         </div>
 
         <!-- Min Length -->
         <div class="flex flex-col">
-          <label for="minLength" class="text-sm font-medium text-gray-700 mb-1">Min Length</label>
+          <label for="minLength" class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Min Length</label>
           <input id="minLength" type="number" formControlName="minLength" placeholder="e.g., 3"
-            class="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+            class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
 
         <!-- Max Length -->
         <div class="flex flex-col">
-          <label for="maxLength" class="text-sm font-medium text-gray-700 mb-1">Max Length</label>
+          <label for="maxLength" class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Max Length</label>
           <input id="maxLength" type="number" formControlName="maxLength" placeholder="e.g., 10"
-            class="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+            class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
 
         <!-- Min -->
         <div class="flex flex-col">
-          <label for="min" class="text-sm font-medium text-gray-700 mb-1">Min</label>
+          <label for="min" class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Min</label>
           <input id="min" type="number" formControlName="min" placeholder="e.g., 1"
-            class="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+            class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
 
         <!-- Max -->
         <div class="flex flex-col">
-          <label for="max" class="text-sm font-medium text-gray-700 mb-1">Max</label>
+          <label for="max" class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Max</label>
           <input id="max" type="number" formControlName="max" placeholder="e.g., 100"
-            class="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+            class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
 
         <!-- Pattern -->
         <div class="sm:col-span-2 flex flex-col">
-          <label for="pattern" class="text-sm font-medium text-gray-700 mb-1">Pattern</label>
+          <label for="pattern" class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Pattern</label>
           <input id="pattern" type="text" formControlName="pattern" placeholder="e.g., ^[A-Za-z0-9]+$"
-            class="px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+            class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 dark:text-gray-200 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
       </form>
 
       <!-- Modal Footer -->
       <div class="mt-6 flex justify-end space-x-2">
         <button (click)="closeModal()"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition">
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 rounded hover:bg-gray-200 transition">
           Cancel
         </button>
         <button (click)="applyValidation()"
